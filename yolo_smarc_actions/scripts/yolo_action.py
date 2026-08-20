@@ -206,6 +206,12 @@ class YoloActionServer:
         While target is None we publish an EMPTY /yolo/target and no poi, letting
         downstream nodes coast on their own staleness logic through brief losses.
         """
+        try:
+            self._yolo_tracking_cb_inner(msg)
+        except Exception as e:
+            self._node.get_logger().error(f"Exception in yolo tracking callback: {e}")
+
+    def _yolo_tracking_cb_inner(self, msg: DetectionArray):
         target = self._select_target(msg.detections)
 
         # (1) Republish the chosen target (possibly empty) for the vehicle backend.
